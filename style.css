@@ -1,0 +1,33 @@
+.mainTitle h1 {
+  text-align: center;
+  font-size: 50px;
+  text-transform: uppercase;
+  color: #222;
+  letter-spacing: 1px;
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+}
+
+.mainTitle h1:after,
+.mainTitle h1:before {
+  content: " ";
+  display: block;
+  border-bottom: 2px solid #ccc;
+  background-color: #f8f8f8;
+}
+
+.offcanvas-title {
+  text-align: center;
+}
+
+.delete {
+  cursor: pointer;
+  background: url("/icons/trash3.svg") center center/cover no-repeat;
+  width: 20px;
+  height: 20px;
+}
+
+.favoritUsersbtn {
+  margin-left: 45%;
+  margin-bottom: 10px;
+}

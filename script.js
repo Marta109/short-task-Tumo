@@ -23,19 +23,18 @@ fetch("https://jsonplaceholder.typicode.com/users")
   });
 
 tbodyContainer.addEventListener("click", (e) => {
+  let userId = e.target.parentElement.innerText.split("\t")[0];
   const myModal = document.getElementById("exampleModal");
   const modalTitle = myModal.querySelector("#exampleModalLabel");
   const modalBody = myModal.querySelector(".list-group ");
   const btnFavorite = document.querySelector(".favorites");
   modalBody.innerHTML = "";
   let item = {};
-  for (const prop of Object.getOwnPropertyNames(items)) {
+
+  for (const prop of Object.getOwnPropertyNames(item)) {
     delete item[prop];
   }
-
-  fetch(
-    `https://jsonplaceholder.typicode.com/users/${e.target.parentElement.innerText[0]}`
-  )
+  fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
     .then((response) => response.json())
     .then((json) => {
       for (const key in json) {
@@ -63,16 +62,17 @@ tbodyContainer.addEventListener("click", (e) => {
     });
 
   btnFavorite.addEventListener("click", (e) => {
-    console.log("item");
-    console.log(item);
-    favoritUsers[item.id] = item;
-
+    if (item.id >= 0) {
+      favoritUsers[item.id] = {...item};
+      for (const prop of Object.getOwnPropertyNames(item)) {
+        delete item[prop];
+      }
+    }
     updateFavoriteList();
   });
 });
 
-function updateFavoriteList(obj=favoritUsers) {
-  console.log(favoritUsers);
+function updateFavoriteList(obj = favoritUsers) {
   const favorites = document.querySelector(".favoritUsers");
   favorites.innerHTML = "";
 

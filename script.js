@@ -1,21 +1,26 @@
+const favoritUsersItems = document.querySelector(".favoritUsers");
 const tbodyContainer = document.querySelector(".tbody");
+const favoriteBtn = document.querySelector(".favorites");
 const favoritUsers = {};
+const userData = {};
 
+// get users data
 fetch("https://jsonplaceholder.typicode.com/users")
   .then((response) => response.json())
   .then((json) => {
-    json.forEach((el) => {
+    json.forEach((el, i) => {
       tbodyContainer.innerHTML += `<tr data-bs-toggle="modal" data-bs-target="#exampleModal"> 
-        <th scope="row" class="id"> 
-        ${el.id}
-        </th>
-        <td>${el.name}</td>
-        <td>${el.username}</td>
-        <td>${el.email}</td>
-        <td>${el.phone}</td>
-        <td>${el.website}</td>
-        </tr>
-        `;
+      <th scope="row" class="id"> 
+      ${el.id}
+      </th>
+      <td>${el.name}</td>
+      <td>${el.username}</td>
+      <td>${el.email}</td>
+      <td>${el.phone}</td>
+      <td>${el.website}</td>
+      </tr>
+      `;
+      userData[el.id] != el.id ? (userData[el.id] = el) : "";
     });
   })
   .catch((error) => {
@@ -27,49 +32,47 @@ tbodyContainer.addEventListener("click", (e) => {
   const myModal = document.getElementById("exampleModal");
   const modalTitle = myModal.querySelector("#exampleModalLabel");
   const modalBody = myModal.querySelector(".list-group ");
-  const btnFavorite = document.querySelector(".favorites");
   modalBody.innerHTML = "";
-  let item = {};
 
-  for (const prop of Object.getOwnPropertyNames(item)) {
-    delete item[prop];
-  }
-  fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
-    .then((response) => response.json())
-    .then((json) => {
-      for (const key in json) {
-        if (key == "name") {
-          item[key] = json[key];
-          modalTitle.innerHTML = `name ${json.name}`;
-        } else if (key == "address" || key == "company") {
-          for (const i in json[key]) {
-            if (typeof json[key][i] !== "object") {
+  if (typeof userData[userId] !== undefined) {
+    for (const key in userData[userId]) {
+      key == "name"
+        ? (modalTitle.innerHTML = `name ${userData[userId][key]}`)
+        : "";
+      if (typeof userData[userId][key] != "object") {
+        modalBody.innerHTML += `
+            <li class="list-group-item">${key} - ${userData[userId][key]}</li>
+            `;
+      } else {
+        for (const j in userData[userId][key]) {
+          if (key == "company") {
+            modalBody.innerHTML += `
+                        <li class="list-group-item"> ${key}_${j} - ${userData[userId][key][j]}</li>
+                        `;
+          } else {
+            favoriteBtn;
+            if (j != "geo") {
               modalBody.innerHTML += `
-                    <li class="list-group-item">${i} - ${json[key][i]}</li>
-                    `;
+                      <li class="list-group-item">${j} - ${userData[userId][key][j]}</li>
+                      `;
             }
           }
-        } else {
-          item[key] = json[key];
-          modalBody.innerHTML += `
-        <li class="list-group-item">${key} - ${json[key]}</li>
-        `;
         }
       }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
-
-  btnFavorite.addEventListener("click", (e) => {
-    if (item.id >= 0) {
-      favoritUsers[item.id] = {...item};
-      for (const prop of Object.getOwnPropertyNames(item)) {
-        delete item[prop];
-      }
     }
-    updateFavoriteList();
-  });
+  }
+});
+
+favoriteBtn.addEventListener("click", (e) => {
+  let element = e.target.parentElement.parentElement
+    .querySelector(".list-group-item")
+    .innerText.split("-");
+  let elementiD = Number(element[element.length - 1]);
+  if (!favoritUsers[elementiD]) {
+    favoritUsers[elementiD] = userData[elementiD];
+  }
+  console.log(favoritUsers);
+  updateFavoriteList();
 });
 
 function updateFavoriteList(obj = favoritUsers) {
@@ -81,23 +84,22 @@ function updateFavoriteList(obj = favoritUsers) {
       <th scope="row">${obj[key].id}</th>
       <td>${obj[key].name}</td>
       <td>${obj[key].username} </td>
-      <td><div class="delete"></div></td>  
+      <td><div class="delete"></div></td>
     </tr>`;
   }
 }
 
-const favoritUsersItems = document.querySelector(".favoritUsers");
-
 favoritUsersItems.addEventListener("click", (e) => {
+  let elemid = Number(
+    e.target.parentElement.parentElement.innerText.split("\t")[0]
+  );
   if (e.target.classList.contains("delete")) {
-    showModal(
-      favoritUsers[e.target.parentElement.parentElement.innerText[0]],
-      "Remote user data <br>"
-    );
-    delete favoritUsers[e.target.parentElement.parentElement.innerText[0]];
+    showModal(favoritUsers[elemid], "Remote user data <br>");
+    delete favoritUsers[elemid];
     updateFavoriteList();
   } else {
-    showModal(favoritUsers[e.target.parentElement.innerText[0]]);
+    elemid = Number(e.target.parentElement.querySelector("th").innerText);
+    showModal(favoritUsers[elemid]);
   }
 });
 
@@ -109,20 +111,28 @@ function showModal(obj, username = "") {
   modalBody.innerHTML = "";
 
   for (const key in obj) {
-    if (key == "name") {
-      modalTitle.innerHTML = `${username}name - ${obj.name}`;
-    } else if (key == "address" || key == "company") {
-      for (const i in obj[key]) {
-        if (typeof obj[key][i] !== "object") {
-          modalBody.innerHTML += `
-                      <li class="list-group-item">${i} - ${obj[key][i]}</li>
-                      `;
-        }
-      }
-    } else {
+    key == "name"
+      ? (modalTitle.innerHTML = `${username}name ${obj[key]}`)
+      : "";
+    if (typeof obj[key] != "object") {
       modalBody.innerHTML += `
           <li class="list-group-item">${key} - ${obj[key]}</li>
           `;
+    } else {
+      for (const j in obj[key]) {
+        if (key == "company") {
+          modalBody.innerHTML += `
+                      <li class="list-group-item"> ${key}_${j} - ${obj[key][j]}</li>
+                      `;
+        } else {
+          favoriteBtn;
+          if (j != "geo") {
+            modalBody.innerHTML += `
+                    <li class="list-group-item">${j} - ${obj[key][j]}</li>
+                    `;
+          }
+        }
+      }
     }
   }
 }

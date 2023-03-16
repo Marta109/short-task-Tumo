@@ -71,7 +71,6 @@ favoriteBtn.addEventListener("click", (e) => {
   if (!favoritUsers[elementiD]) {
     favoritUsers[elementiD] = userData[elementiD];
   }
-  console.log(favoritUsers);
   updateFavoriteList();
 });
 

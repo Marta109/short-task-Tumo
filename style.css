@@ -22,7 +22,7 @@
 
 .delete {
   cursor: pointer;
-  background: url("/icons/trash3.svg") center center/cover no-repeat;
+  background: url("icons/trash3.svg") center center/cover no-repeat;
   width: 20px;
   height: 20px;
 }
